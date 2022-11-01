@@ -1,0 +1,154 @@
+// Chris Coyne, copyright 2006
+// Creative Commons licensed: Creative Commons Attribution 3.0 Unported
+CF::Background = [b 1]
+CF::MinimumSize = 0.5
+
+startshape split(0)
+   baseSpace = 0.003
+   spaceIncrease = 1.5
+   maxDepth = 8
+
+shape split(natural depth) {
+  spacing = baseSpace*(spaceIncrease)^depth
+  scale = 0.5 - spacing
+  shift = 0.25 + spacing/2
+
+  leaf(=) [x  shift y -shift s scale r (randint(4)*90)]
+  leaf(=) [x -shift y -shift s scale r (randint(4)*90)]
+  leaf(=) [x -shift y  shift s scale r (randint(4)*90)]
+  leaf(=) [x  shift y  shift s scale r (randint(4)*90)]
+}
+
+path donut_bit(natural depth) {
+  spacing = baseSpace*(spaceIncrease)^depth
+  MOVETO(0+spacing, 0.5)
+  LINETO(0.5, 0.5)
+  ARCTO(-0.5, -0.5, 1, CF::ArcCW)
+  LINETO(-0.5, 0-spacing)
+  ARCTO(0+spacing, 0.5, 0.5)
+  CLOSEPOLY()
+  FILL[]
+}
+
+shape grid3(vector9 g){
+  loop xz = 3 [ x (1/3) ]
+  loop yz = 3 [ y (1/3) ]
+  if (g[xz + yz*3]) SQUARE [s (1/3) x (-1/3) y (-1/3) ]
+}
+
+shape grid5(vector25 g){
+  loop xz = 5 [ x (1/5) ]
+  loop yz = 5 [ y (1/5) ]
+  if (g[xz + yz*5]) SQUARE [s (1/5) x (-2/5) y (-2/5) ]
+}
+
+path dStripe(start, stop){
+  MOVETO(-0.5,-0.5+start)
+  LINETO(-0.5, stop-0.5)
+  LINETO( stop-0.5,-0.5)
+  LINETO(-0.5+start,-0.5)
+  CLOSEPOLY()
+  FILL[]
+}
+
+shape hazard2 {
+  n = 2
+  loop i = n [ ] dStripe(0/(n*2) + i/n, 1/(n*2) + i/n) [ ]
+  loop i = n [ ] dStripe(1/(n*2) + i/n, 2/(n*2) + i/n) [ r 180 ]
+}
+
+shape hazard3 {
+  n = 3
+  loop i = n [ ] dStripe(0/(n*2) + i/n, 1/(n*2) + i/n) [ ]
+  loop i = n [ ] dStripe(1/(n*2) + i/n, 2/(n*2) + i/n) [ r 180 ]
+}
+
+shape hazard4 {
+  n = 4
+  loop i = n [ ] dStripe(0/(n*2) + i/n, 1/(n*2) + i/n) [ ]
+  loop i = n [ ] dStripe(1/(n*2) + i/n, 2/(n*2) + i/n) [ r 180 ]
+}
+
+shape leaf(natural depth) 
+  rule {
+    figure(depth +1) []
+  }
+  rule 1.7 {
+    if (depth < maxDepth) split(depth + 1) []
+    if (depth >= maxDepth) figure(depth + 1) []
+  }
+
+shape figure(natural depth)
+  rule {
+    SQUARE []
+  }
+  rule {
+    SQUARE []
+    SQUARE [s 0.5 b 1]
+  }
+  rule {
+    CIRCLE []
+  }
+  rule {
+    CIRCLE []
+    CIRCLE [s 0.5 b 1]
+  }
+  rule {
+    grid3((1,0,1,
+           1,1,1,
+           0,1,0)) []
+  }
+  rule {
+    grid3((1,1,1,
+           1,0,0,
+           1,1,1)) []
+  }
+  rule {
+    grid3((1,0,0,
+           0,1,0,
+           0,0,1)) []
+  }
+  rule {
+    grid3((1,0,1,
+           1,1,1,
+           1,0,1)) []
+  }
+  rule {
+    grid3((1,0,0,
+           1,1,1,
+           0,0,1)) []
+  }
+  rule {
+    grid3((1,0,0,
+           1,0,0,
+           1,1,1)) []
+  }
+  rule {
+    grid5((1,1,1,1,1,
+           1,0,0,0,1,
+           1,1,1,1,1,
+           1,0,0,0,1,
+           1,0,0,0,1)) []
+  }
+  rule {
+    grid5((1,0,1,0,1,
+           1,0,1,0,0,
+           1,0,1,1,1,
+           1,0,0,0,0,
+           1,1,1,1,1)) []
+  }
+  rule {
+    hazard2 []
+  }
+  rule {
+    if(depth < maxDepth - 1) hazard3 []
+  }
+  rule {
+    if(depth < maxDepth - 2) hazard4 []
+  }
+  rule {
+    donut_bit(depth) []
+  }
+  rule {
+
+  }

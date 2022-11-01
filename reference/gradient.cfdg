@@ -1,0 +1,16 @@
+CF::Background = [ sat 0.5 ]
+
+startshape gradsquare [ b 0.5 sat 0.5 h 20 ]
+
+shape gradsquare {
+  B = 0.1
+  S = 0.8
+  H = 70
+  SQUARE [ y -1 ]
+  SQUARE [ y 1 h 1 H sat 1 S b 1 B ]
+  G = 100
+  loop g=G [ x -(1/G)
+             h   (1/(G-g)) H
+             sat (1/(G-g)) S
+             b   (1/(G-g)) B] SQUARE [ s (1/G+0.005) 1 x ((G-1)/(G*2)) ]
+}

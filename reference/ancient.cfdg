@@ -1,0 +1,94 @@
+/*Ancient Scripts by Leaf Garland*/
+
+background { hue 40 sat 0.2 b -0.2}
+
+startshape LINES
+
+rule LINES {
+    20 * {y -90} NEWLINE {hue 90 sat 0.7 b 0.2 a -0.5}
+}
+
+rule NEWLINE {
+    LINE {y 0}
+}
+
+rule NEWLINE {
+    LINE {y 20}
+}
+
+rule NEWLINE {
+    LINE {y 30}
+}
+
+rule LINE {
+    50 * {x 36} CHAR {y rand(0,7)}
+}
+
+rule CHAR 0.3 {
+    // space
+}
+
+rule CHAR {
+    2 * {x 20 flip 180} STROKE {r 90}
+    2 * {y 20 flip 180} STROKE {}
+}
+
+rule CHAR {
+    4 * {r 60} STROKE {}
+}
+
+rule CHAR {
+    STROKE {r 90}
+    3 * {y 10 flip 180} STROKE {}
+}
+
+rule STROKE {
+    B {}
+}
+
+rule STROKE {
+    B {flip 90}
+}
+
+rule B 30 {
+    MARK {}
+    B {x .6 r 10}
+}
+
+rule B 30 {
+    MARK {}
+    B {x .6 r 3}
+}
+
+rule B 250 {
+    MARK {}
+    B {x .9}
+}
+
+rule B 10 {
+    MARK {}
+    B {flip 90}
+}
+
+rule B 10 { }
+
+
+rule MARK 3 {
+    CIRCLE {}
+}
+
+rule MARK {
+    CIRCLE {s 2}
+}
+
+rule MARK {
+    SQUARE {s 3}
+}
+
+rule MARK {
+    CIRCLE {s 4}
+}
+
+rule MARK 0.01 {
+    CIRCLE {s 7}
+}

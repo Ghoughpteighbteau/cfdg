@@ -1,0 +1,79 @@
+// Chris Coyne, copyright 2006
+// Creative Commons licensed: Creative Commons Attribution 3.0 Unported
+CF::Background = [b 1 0.5]
+CF::MinimumSize = 0.1
+CF::Impure = 1
+CF::Size = [s 1.7 1.7]
+
+strokeWidth=0.0025
+
+startshape isoGrid()
+
+shape isoGrid {
+  loop yi = 50 [ y (0.5/(-50/2)) z 500]
+  loop xi = 50 [ x (1  /( 50/2))]
+  if (rand(0,1) <= 0.1) iso() [x -1 0.5 z randint(0,499)]
+}
+
+shape iso {
+  isoTop() []
+  isoFill() [z -0.01 h 1 (60*randint(0,6)) sat 1 0.75 b 1 0.6 ]
+  SQUARE [trans 0 0 -1 -0.5 0 -1 b 1 z -0.2 y -0.5]
+}
+
+shape isoFill
+rule 0.5 {
+  isoFillDown(select(rand(4),200,100,50,25)) []
+  isoFillDown(select(rand(3),100,50,25)) [f 90]
+}
+rule 0.25 {
+  isoFillDown(select(rand(4),200,100,50,25)) []
+}
+rule 0.25 {
+  isoFillDown(select(rand(3),100,50,25)) [f 90]
+}
+rule {
+  isoFillLeft(select(rand(3),100,50,25)) []
+}
+rule {
+  isoFillLeft(select(rand(3),100,50,25)) [f 90]
+}
+rule {
+  isoFillWide(select(rand(4),100,50,25,12.5)) []
+}
+rule {}
+
+shape isoFillDown(n) {
+  loop n [x (1/n) (-0.5/n)] isoDown() []
+}
+
+path isoDown {
+  LINETO(0,-1)
+  STROKE(strokeWidth)[]
+}
+
+shape isoFillLeft(n) {
+  loop n-1 [x (-1/n) (-0.5/n)] isoLeft() [x (-1/n) (-0.5/n)]
+}
+
+path isoLeft {
+  LINETO(1,-0.5)
+  STROKE(strokeWidth)[]
+}
+
+shape isoFillWide(n) {
+  loop w=n-1 [] isoWide(w/(n)) []
+}
+
+path isoWide(w) {
+  MOVETO(-w,-w/2)
+  LINETO(w,-w/2)
+  STROKE(strokeWidth)[]
+}
+
+path isoTop {
+  MOVETO(-1,-0.5)
+  LINETO(0,0)
+  LINETO(1,-0.5)
+  STROKE(strokeWidth)[]
+}

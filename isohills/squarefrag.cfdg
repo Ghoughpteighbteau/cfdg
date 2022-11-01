@@ -1,0 +1,76 @@
+// Chris Coyne, copyright 2006
+// Creative Commons licensed: Creative Commons Attribution 3.0 Unported
+CF::Background = [b 1 0.5]
+CF::MinimumSize = 0.1
+CF::Impure = 1
+CF::Size = [s 10 10 x -12 y -12]
+
+strokeWidth=0.01
+
+startshape boxGrid() []
+
+shape boxGrid {
+	n=200
+  loop n [ y sqrt(0.02) z -1000 b 0.05 ]
+  loop n [ x sqrt(0.02) ]
+  if(randint(0,5)==0) box() [r (45 + randint(0,4)*90) z -randint(0,999)]
+}
+
+shape box {
+  hueColor=(randint(6)*60)
+	SQUARE [b 1 1 z -0.2]
+	fill() [b 1 0.6 sat 1 0.7 h 1 hueColor z -0.1]
+	outline() [h 1 hueColor sat 1 0.7 b 1 0.6]
+}
+
+shape fill
+  rule {
+  	squareFill()[]
+  }
+  rule {
+    downFill()[]
+  }
+  rule {
+    diagFill()[]
+  }
+  rule 0.2 {
+
+  }
+
+shape squareFill {
+  n=select(randint(3),10,20,40)
+	loop xi = n [ x (1/n) ]
+  loop yi = n [ y (1/n) ]
+  if(mod((xi+yi),2)) SQUARE [s (1/n) x (-(n/2-0.5)/n) (-(n/2-0.5)/n) ]
+}
+
+path downFill {
+	n=select(randint(3),10,20,40)
+  loop n-1 [x (1/n)]{
+		MOVETO((-(n/2-1)/n),0.5 )
+		LINETO((-(n/2-1)/n),-0.5)
+	}
+	STROKE(strokeWidth, CF::SquareCap) []
+}
+
+shape diagFill {
+	n=select(randint(3),10,20,40)
+	loop i=n [] diagFillLine(i/n)[]
+	loop i=n [] diagFillLine(i/n)[f -45]
+}
+
+path diagFillLine(w) {
+	MOVETO(-0.5 + w, 0.5    )
+	LINETO( 0.5    ,-0.5 + w)
+  STROKE(strokeWidth) []
+}
+
+path outline {
+	MOVETO( 0.5, 0.5)
+  LINETO( 0.5,-0.5)
+  LINETO(-0.5,-0.5)
+  LINETO(-0.5, 0.5)
+  LINETO( 0.5, 0.5)
+	STROKE(strokeWidth, CF::SquareCap)[]
+}
+

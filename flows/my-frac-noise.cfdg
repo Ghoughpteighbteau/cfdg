@@ -1,0 +1,43 @@
+//Perlin noise project, by Alex Bruce
+//Bastardized from https://www.contextfreeart.org/gallery/view.php?id=3786
+
+width = 500
+CF::Size = [s width width x -(width/2) y -(width/2)]
+
+octaves=7
+test_scale=width/3
+test_offset=0..2^20 //test offset
+
+startshape texture [h 0 0.5 1]
+
+shape texture {
+  loop i=(width+1) [] loop j=(width+1) [] {
+    hsb = color(i, j)
+    SQUARE [x i j hue 1 hsb[0] sat 1 hsb[1] b 1 hsb[2]]
+  }
+}
+
+vector3 color(xx, yy) = (0 , 0, perlin(xx+test_offset,yy+test_offset,test_scale,octaves))
+//vector3 color(xx, yy) = (0 , 0, randxy(xx,yy))
+
+sanity_offset=30000 //perlin noise produces odd results at origin point
+number perlin(xx, yy, scale, oct) =
+  perlin_loop(xx+sanity_offset,yy+sanity_offset,scale,oct)/2
+number perlin_loop(xx, yy, scale, oct) = if(oct < 1, 0,
+  noise(xx, yy, scale/(1.4^oct))/(1.4^oct) + perlin_loop(xx, yy, scale, oct-1)
+)
+
+number noise(xx, yy, scale) = let(
+  xi = floor(xx/scale); yi = floor(yy/scale);
+  xf = xx/scale - xi;   yf = yy/scale - yi;
+  lerp(lerp(randxy(xi, yi  ), randxy(xi+1,yi  ), xf),
+       lerp(randxy(xi, yi+1), randxy(xi+1,yi+1), xf), yf)
+)
+lerp(v1, v2, t) = (1-t)*v1 + t*v2
+
+rand_p1=25889
+rand_p2=26903
+number randxy(xx, yy) = mod(
+  bitxor(xx*(xx+rand_p1)+rand_p2,
+         yy*(yy+rand_p2)+rand_p1),
+  10000)/10000

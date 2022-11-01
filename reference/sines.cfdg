@@ -1,0 +1,7 @@
+startshape sines [ ]
+
+shape sines {
+  loop U=60 [ ] loop V=50 [ ]
+    CIRCLE [ x (U*2)
+             y -(V*2-cos(U*6*(V/10+1))*10) ]
+}

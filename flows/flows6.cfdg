@@ -1,0 +1,135 @@
+CF::MinimumSize = 0.5
+CF::Impure = 1
+CF::Background = [hue 163 b -.9 saturation 0]
+CF::Size = [s 107 35 x 0 y 0]
+
+// paint strokes
+Pl=(7..20)^2   //paint length
+Pn=(60..265)^2 //paint number
+Pa=0.05..0.3   //paint alpha
+Ps=0.02..0.10  //paint size
+Pg=0.01..-0.01 //paint gravity
+Pc=1..20       //color scale
+
+noise_offset=5000..30000
+
+// wind
+Wx=(0.1..0.8)/(1..4) // wind x scale
+Wy=(0.1..0.8)/(1..4) // wind y scale
+Ws=0.5..10      // wind all scale
+Wb=0..0.2      // wind brownian
+Wz=(0.02..-0.02)/40 // wind zoom
+
+//PALETTE=(
+//// hue, sat , b
+//  (222, 0.75, 0.3)  ,
+//  (0  , 0   , 1)    ,
+//  (169, 0.63, 0.38) ,
+//  (75 , 0.39, 0.67) ,
+//  (0  , 0   , 1)    ,
+//  (89 , 0.14, 0.88) ,
+//  (222, 0.57, 0.6)  ,
+//  (350, 0.13, 0.93) ,
+//  (0  , 0   , 1)    ,
+//  (30 , 0.95, 0.99) ,
+//  (55 , 0.33, 0.80) ,
+//  (0  , 0   , 1)    ,
+//  (13 , 0.39, 0.82) ,
+//  (18 , 0.93, 0.9)
+//)
+//PAL_NUM=14
+
+// old orange and pink highlited palette
+//PALETTE=(
+//// hue, sat , b
+//  (307, 0.8 , 0.75),
+//  (13 , 0.55, 0.83),
+//  (31 , 0.30, 0.91),
+//  (109, 0.17, 0.64),
+//  (0  , 0   , 0.29)
+//)
+
+//// dark red highlight, grey blue palette
+//PALETTE=(
+//// hue, sat , b
+//  (21 , 0.42, 0.20),
+//  (37 , 0.51, 0.80),
+//  (354, 0.05, 0.84),
+//  (250, 0.26, 0.64),
+//  (342, 0.61, 0.17)
+//)
+
+PALETTE=(
+// hue, sat , b
+  (81 , 0.76, 0.66),
+  (64 , 0.36, 0.93),
+  (46 , 0.59, 0.75),
+  (18 , 0.77, 0.69),
+  (22 , 0.61, 0.29)
+)
+PAL_NUM=5
+
+vector3 col(u, v) = PALETTE[
+  floor(max(0,min(0.999,
+    (perlin(u+noise_offset, v+noise_offset, Pc, 20, 7)-0.33)
+    *2.5
+  ))*PAL_NUM)*3,
+  3
+]
+
+startshape flowfield []
+
+shape flowfield {
+  loop Pn [] {
+    xx=-48..48
+    yy=-12..12
+    //SQUARE [ x xx yy hue col(xx,yy) ]
+    flowline(xx, yy, Pl) [hue col(xx,yy) blend CF::Normal]
+  }
+}
+
+shape flowline(number xx, number yy, number t) {
+  CIRCLE [ x xx y yy a -(1-Pa) z -0.001 s Ps ]
+  if( t > 0 ) flowline(
+    xx + (-0.01..0.01) * Wb + xx * Wz
+       + (perlin(xx+noise_offset*1, yy+noise_offset*1, 1, Ws, 5)-0.5) * Wx,
+    yy + (-0.01..0.01) * Wb + yy * Wz
+       + (perlin(xx+noise_offset*2, yy+noise_offset*2, 1, Ws, 4)-0.5) * Wy - Pg,
+    t - 1 ) [ ]
+}
+//path flowline(number xx, number yy, number t) {
+//  LINETO(xx, yy)
+//  if ( t > 0 ) flowline(
+//    xx + (-0.01..0.01) * Wb
+//       + (perlin(xx+noise_offset*1, yy+noise_offset*1, 1, Ws, 5)-0.5) * Wx,
+//    yy + (-0.01..0.01) * Wb
+//       + (perlin(xx+noise_offset*2, yy+noise_offset*2, 1, Ws, 5)-0.5) * Wy - Pg,
+//    t - 1)
+//  if ( t > 0 ) flowline( 1, 1, 0)
+//  STROKE( Ps, CF::RoundJoin + CF::RoundCap ) [ a -(1-Pa) ]
+//}
+
+sanity_offset=30000 //perlin noise produces odd results at origin point
+number perlin(xx, yy, zz, scale, oct) =
+  perlin_loop(xx+sanity_offset,yy+sanity_offset,zz+sanity_offset,scale,oct)/2
+number perlin_loop(xx, yy, zz, scale, oct) = if(oct < 1, 0,
+  noise(xx, yy, zz, scale/(1.4^oct))/(1.4^oct) + perlin_loop(xx, yy, zz, scale, oct-1)
+)
+
+number noise(xx, yy, zz, scale) = let(
+  xi = floor(xx/scale); yi = floor(yy/scale); zi = floor(zz/scale);
+  xf = xx/scale - xi;   yf = yy/scale - yi;   zf = zz/scale - zi;
+  lerp(lerp(lerp(randxy(xi, yi  , zi  ), randxy(xi+1, yi  , zi  ), xf),
+            lerp(randxy(xi, yi+1, zi  ), randxy(xi+1, yi+1, zi  ), xf), yf),
+       lerp(lerp(randxy(xi, yi  , zi+1), randxy(xi+1, yi  , zi+1), xf),
+            lerp(randxy(xi, yi+1, zi+1), randxy(xi+1, yi+1, zi+1), xf), yf), zf))
+
+lerp(v1, v2, t) = (1-t)*v1 + t*v2
+
+rand_p1=25889
+rand_p2=26903
+rand_p3=22907
+number randxy(xx, yy, zz) =
+  mod(bitxor(bitxor(xx*(xx+rand_p1)+rand_p3,
+                    yy*(yy+rand_p2)+rand_p1),
+                    zz*(zz+rand_p3)+rand_p2),10000)/10000

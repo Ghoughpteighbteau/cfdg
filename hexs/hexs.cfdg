@@ -1,0 +1,26 @@
+CF::Impure = 1
+CF::MinimumSize = 20
+CF::Background = [ b -0.7 ]
+D=9
+startshape recurse_hex(D)
+
+shape recurse_hex(natural d) {
+  hex [ ]
+  //sub_hex(d) [ ]
+  loop 6 [[r 60]] sub_hex(d) [ x -1 ]
+}
+shape sub_hex(natural d) {
+  if ( 0..6 < 5) recurse_hex(d-1) [
+    r 30 s (tan(30))
+    hue (floor(0..1)*30)
+    sat (randint(2)/20)
+    b   (randint(2)/15)
+    z 0.1..0.1001 ]
+}
+
+path hex {
+  MOVETO(-1,0)
+  loop 6 [r 60] LINETO(-1,0)
+  CLOSEPOLY()
+  FILL [ b 0.1 sat 0.1 ]
+}

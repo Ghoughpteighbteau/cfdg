@@ -1,0 +1,78 @@
+// Fletching Project. Style copied from /u/red_blue_yellow's design without access to source
+// https://www.reddit.com/r/generative/comments/8tmloo/untitled/
+// Written by manghoti
+
+CF::Background = [ hue 220 sat 0.2 b -0.8 ]
+CF::Impure = 1
+
+X=80
+Y=1600
+
+PALETTE=(
+// hue, sat , b
+  (222, 0.75, 0.3)  ,
+  (0  , 0   , 1)    ,
+  (169, 0.63, 0.38) ,
+  (75 , 0.39, 0.67) ,
+  (0  , 0   , 1)    ,
+  (89 , 0.14, 0.88) ,
+  (222, 0.57, 0.6)  ,
+  (350, 0.13, 0.93) ,
+  (0  , 0   , 1)    ,
+  (30 , 0.95, 0.99) ,
+  (55 , 0.33, 0.80) ,
+  (0  , 0   , 1)    ,
+  (13 , 0.39, 0.82) ,
+  (18 , 0.93, 0.9)
+)
+PAL_NUM=14
+
+startshape bars()
+
+shape bars {
+  loop u=X [ x 2.2 ] bar(u) [ ]
+}
+
+shape bar(number u) {
+  stripe(u*2) [ ]
+  stripe(u*2+1) [ flip 90 x 1.1 ]
+}
+
+OFFSET=0..2^13 //this moves the frac_noise noise around for different results each run
+shape stripe(number u) {
+  loop v=Y [ y -0.1 ] {
+    SQUARE [ trans 0 -0.8 0 -0.91 1 0
+             hue col(u,v)
+             a   1 min(1,max(0,frac_noise(u+OFFSET*4, v/200 +OFFSET*4, 0.5 , 6)*16-8 + (-1..1))) ]
+  }
+}
+
+vector3 col(u, v) = PALETTE[floor(max(0,min(0.999,
+                            frac_noise(u+OFFSET*6, v/900+OFFSET*6, 1 , 8)*0.5 +
+                            frac_noise(u+OFFSET*7, v/15+OFFSET*7 , 100, 6)*1.7
+                            -.75 + (-0.02..0.02)
+                            ))*PAL_NUM)*3,3]
+
+//============= fractal noise gen =============
+sanity_offset=40000 //frac_noise noise produces odd results at origin point
+number frac_noise(xx, yy, scale, oct) =
+  frac_noise_loop(xx+sanity_offset,yy+sanity_offset,scale,oct)/2
+number frac_noise_loop(xx, yy, scale, oct) = if(oct < 1, 0,
+  noise(xx, yy, scale/(1.4^oct))/(1.4^oct) + frac_noise_loop(xx, yy, scale, oct-1)
+)
+number noise(xx, yy, scale) = let(
+  xi = floor(xx/scale); yi = floor(yy/scale);
+  xf = xx/scale - xi;   yf = yy/scale - yi;
+  lerp(lerp(randxy(xi, yi  ), randxy(xi+1,yi  ), xf),
+       lerp(randxy(xi, yi+1), randxy(xi+1,yi+1), xf), yf)
+)
+
+lerp(v1, v2, t) = (1-t)*v1 + t*v2
+
+// terrible random number generator
+rand_p1=25889
+rand_p2=26903
+number randxy(xx, yy) = mod(
+  bitxor(xx*(xx+rand_p1)+rand_p2,
+         yy*(yy+rand_p2)+rand_p1),
+  10000)/10000

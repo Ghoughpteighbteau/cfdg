@@ -1,0 +1,30 @@
+startshape root
+
+CHEVRON_WIDTH = 2
+CHEVRON_HEIGHT = 1
+CHEVRON_SKEW = 40
+
+GAP_WIDTH = 0.1
+
+ASPECT_RATIO = 2
+NUM_COLUMNS = 50
+CANVAS_WIDTH = NUM_COLUMNS * CHEVRON_WIDTH
+CANVAS_HEIGHT = CANVAS_WIDTH / ASPECT_RATIO
+NUM_ROWS = (CANVAS_HEIGHT / CHEVRON_HEIGHT) + 1
+
+CF::Size = [s CANVAS_WIDTH CANVAS_HEIGHT x -(CANVAS_WIDTH / 2) y -(CANVAS_HEIGHT / 2)]
+
+shape root {
+    doublewidth = 2 * CHEVRON_WIDTH
+    loop NUM_COLUMNS [x doublewidth] {
+        column[b 0.8 sat 0.6 s CHEVRON_WIDTH CHEVRON_HEIGHT]
+        column[b 0.8 sat 0.6 s CHEVRON_WIDTH CHEVRON_HEIGHT flip 90 x CHEVRON_WIDTH]
+    }
+}
+
+shape column {
+    loop NUM_ROWS [y CHEVRON_HEIGHT] {
+        SQUARE [skew 0 CHEVRON_SKEW h rand(360)]
+        // SQUARE [b -1 sat 0 s GAP_WIDTH CHEVRON_HEIGHT]
+    }
+}

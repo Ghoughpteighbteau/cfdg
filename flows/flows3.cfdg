@@ -1,0 +1,44 @@
+CF::MinimumSize = 0.5
+CF::Impure = 1
+
+Pl=1000
+Po=5000..30000
+
+startshape flowfield []
+
+shape flowfield {
+  loop 13000 [] flowline(-50..50, -50..50, Pl) []
+}
+
+shape flowline(number xx, number yy, number t) {
+  CIRCLE [ x xx y yy s 0.2 a -0.99 b -1 ]
+  if( t > 0 ) flowline(
+    xx - (xx/900) + (-0.03..0.03) + (perlin(xx+Po*1, yy+Po*1, t/50, 5, 4)-0.5)*(0.5..1.5),
+    yy - (yy/900) + (-0.03..0.03) + (perlin(xx+Po*2, yy+Po*2, t/50, 5, 4)-0.5)*(0.5..1.5),
+    t - 1 ) [ ]
+}
+
+sanity_offset=30000 //perlin noise produces odd results at origin point
+number perlin(xx, yy, zz, scale, oct) =
+  perlin_loop(xx+sanity_offset,yy+sanity_offset,zz+sanity_offset,scale,oct)/2
+number perlin_loop(xx, yy, zz, scale, oct) = if(oct < 1, 0,
+  noise(xx, yy, zz, scale/(1.4^oct))/(1.4^oct) + perlin_loop(xx, yy, zz, scale, oct-1)
+)
+
+number noise(xx, yy, zz, scale) = let(
+  xi = floor(xx/scale); yi = floor(yy/scale); zi = floor(zz/scale);
+  xf = xx/scale - xi;   yf = yy/scale - yi;   zf = zz/scale - zi;
+  lerp(lerp(lerp(randxy(xi, yi  , zi  ), randxy(xi+1, yi  , zi  ), xf),
+            lerp(randxy(xi, yi+1, zi  ), randxy(xi+1, yi+1, zi  ), xf), yf),
+       lerp(lerp(randxy(xi, yi  , zi+1), randxy(xi+1, yi  , zi+1), xf),
+            lerp(randxy(xi, yi+1, zi+1), randxy(xi+1, yi+1, zi+1), xf), yf), zf))
+
+lerp(v1, v2, t) = (1-t)*v1 + t*v2
+
+rand_p1=25889
+rand_p2=26903
+rand_p3=22907
+number randxy(xx, yy, zz) =
+  mod(bitxor(bitxor(xx*(xx+rand_p1)+rand_p3,
+                    yy*(yy+rand_p2)+rand_p1),
+                    zz*(zz+rand_p3)+rand_p2),10000)/10000
